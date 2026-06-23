@@ -19,10 +19,12 @@ def index():
 
 @app.route('/api/data')
 def get_data():
-    """Son 100 sensör kaydı."""
+    """Tüm sensör kayıtları (limit parametresiyle)."""
+    from flask import request
+    limit = request.args.get('limit', 480, type=int)
     conn = get_db()
     rows = conn.execute(
-        "SELECT * FROM sensor_data ORDER BY time DESC LIMIT 100"
+        f"SELECT * FROM sensor_data ORDER BY time ASC LIMIT {limit}"
     ).fetchall()
     conn.close()
     return jsonify([dict(r) for r in rows])

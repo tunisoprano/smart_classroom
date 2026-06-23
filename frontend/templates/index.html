@@ -130,7 +130,7 @@ async function load() {
   try {
     [sum, recent, alerts, energy] = await Promise.all([
       fetch('/api/summary').then(r=>r.json()),
-      fetch('/api/data').then(r=>r.json()),
+      fetch('/api/data?limit=480').then(r=>r.json()),
       fetch('/api/alerts').then(r=>r.json()),
       fetch('/api/energy').then(r=>r.json()),
     ]);
@@ -145,9 +145,9 @@ async function load() {
   }
 
   document.getElementById('dot').style.background = '#22c55e';
-  document.getElementById('statusText').textContent = `${recent.length} kayıt · Son: ${fmtT(recent[0].time)}`;
+  document.getElementById('statusText').textContent = `${recent.length} kayıt · Son: ${fmtT(recent[recent.length-1].time)}`;
 
-  const last = recent[0];
+  const last = recent[recent.length-1];
   const sp   = sum.savings_pct || 0;
   const co2Color = last.co2 > 1000 ? 'var(--red)' : last.co2 > 700 ? 'var(--yellow)' : 'var(--green)';
   const tempColor = last.temperature > 28 ? 'var(--red)' : last.temperature > 25 ? 'var(--yellow)' : 'var(--text)';
@@ -253,7 +253,7 @@ async function load() {
   `;
 
   // charts
-  const rev = [...recent].reverse();
+  const rev = recent;  // API artık ASC sıralı döndürüyor
   const lbls = rev.map(r => fmtT(r.time));
   const co = { responsive:true, maintainAspectRatio:false, animation:{duration:400},
     plugins:{legend:{display:false}},
